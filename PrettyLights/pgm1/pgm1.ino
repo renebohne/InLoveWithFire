@@ -118,7 +118,8 @@ void rainbow(int* _leds, uint8_t wait) {
 
   for(j=0; j<256; j++) {
     for(i=0; i<sizeof(_leds)/sizeof(int); i++) {
-      strip.setPixelColor(lednumbers[_leds[i]], Wheel((i+j) & 255));
+      //strip.setPixelColor(lednumbers[_leds[i]], Wheel((i+j) & 255));
+      strip.setPixelColor(_leds[i], Wheel((i+j) & 255));
     }
     strip.show();
     delay(wait);
