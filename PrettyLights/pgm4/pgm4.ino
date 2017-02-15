@@ -59,11 +59,21 @@ int pgm4_flash[] = { 7,6,5,4,3,2,1, 32,33,34,35,36,37,38,39,40,41,42,43,44,45,46
 int pgm4_rainbowA[] = {32,33,37,38,51,50,46,45,42};
 int pgm4_rainbowB[] = {34,35,36,39,41,49,48,47};
 
+int mapLED(int i)
+{
+  if(i<1)
+  {
+    return 0;
+  }
+  
+  return i - 1;
+}
+
 void pgm4()
 {
   
-  rainbow(pgm4_rainbowA,1);
-  rainbow(pgm4_rainbowB,1);
+  rainbow(pgm4_rainbowA,1,sizeof(pgm4_rainbowA)/sizeof(int));
+  rainbow(pgm4_rainbowB,1,sizeof(pgm4_rainbowB)/sizeof(int));
       
   
   if (BACK_TO_MAIN)
@@ -77,9 +87,9 @@ void pgm4()
   {
       if(i>0)
       {
-        strip.setPixelColor(pgm4_flash[i-1], strip.Color(0, 0, 0)); //off
+        strip.setPixelColor(mapLED(pgm4_flash[i-1]), strip.Color(0, 0, 0)); //off
       }
-      strip.setPixelColor(pgm4_flash[i], orange); //orange
+      strip.setPixelColor(mapLED(pgm4_flash[i]), orange); //orange
  
     if (BACK_TO_MAIN)
     {
@@ -121,11 +131,12 @@ uint32_t Wheel(byte WheelPos) {
   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-void rainbow(int* _leds, uint8_t wait) {
+void rainbow(int* _leds, uint8_t wait, int count) {
   uint16_t i, j;
 
   for(j=0; j<256; j++) {
-    for(i=0; i<sizeof(_leds)/sizeof(int); i++) {
+    for(i=0; i<count; i++) {
+      //strip.setPixelColor(lednumbers[_leds[i]], Wheel((i+j) & 255));
       strip.setPixelColor(_leds[i], Wheel((i+j) & 255));
     }
     strip.show();
