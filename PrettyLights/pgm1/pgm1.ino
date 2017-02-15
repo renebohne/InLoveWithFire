@@ -25,31 +25,6 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(51, PIN, NEO_GRB + NEO_KHZ800);
 
 
 
-//das sind die Nummern der LEDs von unten nach oben - natürliche Zähleweise von 1 an
-int lednumbers[] = {11, 26, 10, 12, 25, 27, 9, 13, 24, 28, 8, 14, 23, 29, 19, 15, 22, 30, 18, 16, 21, 31, 17, 20, 32, 51, 50, 33, 49, 34, 48, 35, 47, 36, 46, 37, 45, 38, 44, 39, 43, 40, 42, 41};
-
-//das sind die Anzahlen der LEDs pro Layer (eine Reihe)
-int lengths[] = {2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-
-//das sind die Anzahlen der LEDs pro Etage für den Regenbogen(mehrere Reihen möglich)
-int length_etagen[] = {10, 12, 6, 4, 4, 4, 3};
-
-void layerByLayer()
-{
-  int lednumbers_idx = 0;
-
-  for (int i = 0; i < (sizeof(lengths) / sizeof(int)); i++)
-  {
-    for (int j = 0; j < lengths[i]; j++)
-    {
-      strip.setPixelColor(lednumbers[lednumbers_idx + j], strip.Color(0, 0, 200));
-    }
-    strip.show();
-    lednumbers_idx += lengths[i];
-  }
-}
-
-
 
 
 int leds_pgm1[] = {8,9,18,17, 11,12,13,14, 29,30,31,20, 26,25,24,23, 32,35,38,41,42,43,44,45,48,51};
@@ -75,7 +50,8 @@ void pgm1()
   }
   strip.show();
   //rainbow breathing (heller und dunkler)
-  rainbow(leds_pgm1,DELAY_PGM1);
+  int count = sizeof(leds_pgm1)/sizeof(int);
+  rainbow(leds_pgm1,DELAY_PGM1, count);
   if (BACK_TO_MAIN)
   {
     return;
@@ -113,11 +89,11 @@ uint32_t Wheel(byte WheelPos) {
   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-void rainbow(int* _leds, uint8_t wait) {
+void rainbow(int* _leds, uint8_t wait, int count) {
   uint16_t i, j;
 
   for(j=0; j<256; j++) {
-    for(i=0; i<sizeof(_leds)/sizeof(int); i++) {
+    for(i=0; i<count; i++) {
       //strip.setPixelColor(lednumbers[_leds[i]], Wheel((i+j) & 255));
       strip.setPixelColor(_leds[i], Wheel((i+j) & 255));
     }
