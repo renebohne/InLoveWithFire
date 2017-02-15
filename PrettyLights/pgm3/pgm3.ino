@@ -28,29 +28,9 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(51, PIN, NEO_GRB + NEO_KHZ800);
 //das sind die Nummern der LEDs von unten nach oben - natürliche Zähleweise von 1 an
 int lednumbers[] = {11, 26, 10, 12, 25, 27, 9, 13, 24, 28, 8, 14, 23, 29, 19, 15, 22, 30, 18, 16, 21, 31, 17, 20, 32, 51, 50, 33, 49, 34, 48, 35, 47, 36, 46, 37, 45, 38, 44, 39, 43, 40, 42, 41};
 
-//das sind die Anzahlen der LEDs pro Layer (eine Reihe)
-int lengths[] = {2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
 
-//das sind die Anzahlen der LEDs pro Etage für den Regenbogen(mehrere Reihen möglich)
-int length_etagen[] = {10, 12, 6, 4, 4, 4, 3};
-
-void layerByLayer()
-{
-  int lednumbers_idx = 0;
-
-  for (int i = 0; i < (sizeof(lengths) / sizeof(int)); i++)
-  {
-    for (int j = 0; j < lengths[i]; j++)
-    {
-      strip.setPixelColor(lednumbers[lednumbers_idx + j], strip.Color(0, 0, 200));
-    }
-    strip.show();
-    lednumbers_idx += lengths[i];
-  }
-}
-
-int pgm3_leds[] = { 19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,  32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,  20,21,22,23,24,25,26,27,28,29};
-
+  int tuerkis = strip.Color(0, 0x0F, 0x0F);  
+  int rot = strip.Color(200, 0, 0);
 
 
 /*
@@ -89,7 +69,15 @@ danach wieder von Angfang an auffüllen ,wenns geht jetzt in einer anderen Farbe
 
 */
 
-
+int mapLED(int i)
+{
+  if(i<1)
+  {
+    return 0;
+  }
+  
+  return i - 1;
+}
 
 void pgm3()
 {
@@ -111,86 +99,85 @@ void pgm3()
     }
   }
   */
+
   
-  int tuerkis = strip.Color(0, 0xDD, 0xDD);  
-  int rot = strip.Color(255, 0, 0);
 
 
-  strip.setPixelColor(8, tuerkis);
-  strip.setPixelColor(11, tuerkis);
-  strip.setPixelColor(29, tuerkis);
-  strip.setPixelColor(26, tuerkis);  
+  strip.setPixelColor(mapLED(8), tuerkis);
+  strip.setPixelColor(mapLED(11), tuerkis);
+  strip.setPixelColor(mapLED(29), tuerkis);
+  strip.setPixelColor(mapLED(26), tuerkis);  
   strip.show();
   delay(DELAY_PGM3);
 
-  strip.setPixelColor(19, tuerkis);
-  strip.setPixelColor(12, tuerkis);
-  strip.setPixelColor(30, tuerkis);
-  strip.setPixelColor(25, tuerkis);  
+  strip.setPixelColor(mapLED(19), tuerkis);
+  strip.setPixelColor(mapLED(12), tuerkis);
+  strip.setPixelColor(mapLED(30), tuerkis);
+  strip.setPixelColor(mapLED(25), tuerkis);  
   strip.show();
   delay(DELAY_PGM3);
 
-  strip.setPixelColor(18, tuerkis);
-  strip.setPixelColor(13, tuerkis);
-  strip.setPixelColor(31, tuerkis);
-  strip.setPixelColor(24, tuerkis);  
+  strip.setPixelColor(mapLED(18), tuerkis);
+  strip.setPixelColor(mapLED(13), tuerkis);
+  strip.setPixelColor(mapLED(31), tuerkis);
+  strip.setPixelColor(mapLED(24), tuerkis);  
   strip.show();
   delay(DELAY_PGM3);
 
 
-  strip.setPixelColor(17, tuerkis);
-  strip.setPixelColor(14, tuerkis);
-  strip.setPixelColor(20, tuerkis);
-  strip.setPixelColor(23, tuerkis);  
+  strip.setPixelColor(mapLED(17), tuerkis);
+  strip.setPixelColor(mapLED(14), tuerkis);
+  strip.setPixelColor(mapLED(20), tuerkis);
+  strip.setPixelColor(mapLED(23), tuerkis);  
   strip.show();
   delay(DELAY_PGM3);
 
-  strip.setPixelColor(32, tuerkis);
-  strip.setPixelColor(51, tuerkis);
+  strip.setPixelColor(mapLED(32), tuerkis);
+  strip.setPixelColor(mapLED(51), tuerkis);
   strip.show();
   delay(DELAY_PGM3);
 
-  strip.setPixelColor(33, tuerkis);
-  strip.setPixelColor(50, tuerkis);
-  strip.show();
-  delay(DELAY_PGM3);
-  
-  strip.setPixelColor(34, tuerkis);
-  strip.setPixelColor(49, tuerkis);
-  strip.show();
-  delay(DELAY_PGM3);
-
-  strip.setPixelColor(36, tuerkis);
-  strip.setPixelColor(48, tuerkis);
+  strip.setPixelColor(mapLED(33), tuerkis);
+  strip.setPixelColor(mapLED(50), tuerkis);
   strip.show();
   delay(DELAY_PGM3);
   
-  strip.setPixelColor(37, tuerkis);
-  strip.setPixelColor(47, tuerkis);
+  strip.setPixelColor(mapLED(34), tuerkis);
+  strip.setPixelColor(mapLED(49), tuerkis);
   strip.show();
   delay(DELAY_PGM3);
 
-  strip.setPixelColor(38, tuerkis);
-  strip.setPixelColor(46, tuerkis);
+  strip.setPixelColor(mapLED(36), tuerkis);
+  strip.setPixelColor(mapLED(48), tuerkis);
   strip.show();
   delay(DELAY_PGM3);
   
-  strip.setPixelColor(39, tuerkis);
-  strip.setPixelColor(45, tuerkis);
+  strip.setPixelColor(mapLED(37), tuerkis);
+  strip.setPixelColor(mapLED(47), tuerkis);
   strip.show();
   delay(DELAY_PGM3);
 
-  strip.setPixelColor(40, tuerkis);
-  strip.setPixelColor(44, tuerkis);
-  strip.show();
-  delay(DELAY_PGM3);
-
-  strip.setPixelColor(41, tuerkis);
-  strip.setPixelColor(43, tuerkis);
+  strip.setPixelColor(mapLED(38), tuerkis);
+  strip.setPixelColor(mapLED(46), tuerkis);
   strip.show();
   delay(DELAY_PGM3);
   
-  strip.setPixelColor(42, rot);
+  strip.setPixelColor(mapLED(39), tuerkis);
+  strip.setPixelColor(mapLED(45), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+
+  strip.setPixelColor(mapLED(40), tuerkis);
+  strip.setPixelColor(mapLED(44), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+
+  strip.setPixelColor(mapLED(41), tuerkis);
+  strip.setPixelColor(mapLED(43), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+  
+  strip.setPixelColor(mapLED(42), rot);
   strip.show();
   delay(DELAY_PGM3);
   

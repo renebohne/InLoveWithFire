@@ -27,35 +27,6 @@ int orange = strip.Color(255, 105, 0);
 
 
 
-//das sind die Nummern der LEDs von unten nach oben - natürliche Zähleweise von 1 an
-int lednumbers[] = {11, 26, 10, 12, 25, 27, 9, 13, 24, 28, 8, 14, 23, 29, 19, 15, 22, 30, 18, 16, 21, 31, 17, 20, 32, 51, 50, 33, 49, 34, 48, 35, 47, 36, 46, 37, 45, 38, 44, 39, 43, 40, 42, 41};
-
-//das sind die Anzahlen der LEDs pro Layer (eine Reihe)
-int lengths[] = {2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-
-//das sind die Anzahlen der LEDs pro Etage für den Regenbogen(mehrere Reihen möglich)
-int length_etagen[] = {10, 12, 6, 4, 4, 4, 3};
-
-void layerByLayer()
-{
-  int lednumbers_idx = 0;
-
-  for (int i = 0; i < (sizeof(lengths) / sizeof(int)); i++)
-  {
-    for (int j = 0; j < lengths[i]; j++)
-    {
-      strip.setPixelColor(lednumbers[lednumbers_idx + j], strip.Color(0, 0, 200));
-    }
-    strip.show();
-    lednumbers_idx += lengths[i];
-  }
-}
-
-int pgm4_leds[] = { 19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,  32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,  20,21,22,23,24,25,26,27,28,29};
-
-
-
-
 /*
 programm 4
 
