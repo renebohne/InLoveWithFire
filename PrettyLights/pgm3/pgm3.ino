@@ -9,13 +9,6 @@
 
 #define PIN 0
 
-#define BTN_INPUT 1
-#define BTN_GND 2
-
-volatile int mode = -1;//0 macht alles aus... 1-4 sind die Programme
-
-boolean BACK_TO_MAIN = false;
-
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(51, PIN, NEO_GRB + NEO_KHZ800);
 
 #define DELAY_PGM1 10
@@ -23,10 +16,6 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(51, PIN, NEO_GRB + NEO_KHZ800);
 #define DELAY_PGM3 200
 #define DELAY_FLASH_PGM4 110
 
-
-
-//das sind die Nummern der LEDs von unten nach oben - natürliche Zähleweise von 1 an
-int lednumbers[] = {11, 26, 10, 12, 25, 27, 9, 13, 24, 28, 8, 14, 23, 29, 19, 15, 22, 30, 18, 16, 21, 31, 17, 20, 32, 51, 50, 33, 49, 34, 48, 35, 47, 36, 46, 37, 45, 38, 44, 39, 43, 40, 42, 41};
 
 
   int tuerkis = strip.Color(0, 0x0F, 0x0F);  
