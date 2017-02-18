@@ -68,6 +68,25 @@ int mapLED(int i)
   return i - 1;
 }
 
+void schenkelblitz()
+{
+  
+  strip.setPixelColor(mapLED(7), tuerkis);
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(6), tuerkis);
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(5), tuerkis);
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(4), tuerkis);
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(3), tuerkis);
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(2), tuerkis);
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(1), tuerkis);
+  delay(DELAY_FLASH_PGM4);
+}
+
 void pgm3()
 {
   /*
@@ -184,7 +203,13 @@ void setup()
 
 
 void loop() {
-    pgm3();
+    pgm3();    
+    delay(2000);
+    strip.clear();
+    strip.show();
+    schenkelblitz();
+    delay(200);
+    schenkelblitz();
 }
 
 
