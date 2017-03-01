@@ -23,7 +23,7 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(51, PIN, NEO_GRB + NEO_KHZ800);
 #define DELAY_PGM3 200
 #define DELAY_FLASH_PGM4 110
 
-int orange = strip.Color(255, 105, 0);
+uint32_t orange = strip.Color(255, 105, 0);
 
 
 
@@ -59,6 +59,16 @@ int pgm4_flash[] = { 7,6,5,4,3,2,1, 32,33,34,35,36,37,38,39,40,41,42,43,44,45,46
 int pgm4_rainbowA[] = {32,33,37,38,51,50,46,45,42};
 int pgm4_rainbowB[] = {34,35,36,39,41,49,48,47};
 
+
+void clearLEDs()//alles aus
+{
+   //alles aus
+    for (uint16_t i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, strip.Color(0, 0, 0));
+    }
+    strip.show();
+}
+
 int mapLED(int i)
 {
   if(i<1)
@@ -73,8 +83,9 @@ void pgm4()
 {
   
   rainbow(pgm4_rainbowA,1,sizeof(pgm4_rainbowA)/sizeof(int));
+  clearLEDs();
   rainbow(pgm4_rainbowB,1,sizeof(pgm4_rainbowB)/sizeof(int));
-      
+  clearLEDs();
   
   if (BACK_TO_MAIN)
   {
