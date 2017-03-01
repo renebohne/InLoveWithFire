@@ -18,8 +18,8 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(51, PIN, NEO_GRB + NEO_KHZ800);
 
 
 
-  int tuerkis = strip.Color(0, 0x0F, 0x0F);  
-  int rot = strip.Color(200, 0, 0);
+  uint32_t tuerkis = strip.Color(0, 0x1F, 0x1F);  
+  uint32_t rot = strip.Color(200, 0, 0);
 
 
 /*
@@ -71,19 +71,26 @@ int mapLED(int i)
 void schenkelblitz()
 {
   
-  strip.setPixelColor(mapLED(7), tuerkis);
+  strip.setPixelColor(mapLED(7), rot);
+  strip.show();
   delay(DELAY_FLASH_PGM4);
-  strip.setPixelColor(mapLED(6), tuerkis);
+  strip.setPixelColor(mapLED(6), rot);
+  strip.show();
   delay(DELAY_FLASH_PGM4);
-  strip.setPixelColor(mapLED(5), tuerkis);
+  strip.setPixelColor(mapLED(5), rot);
+  strip.show();
   delay(DELAY_FLASH_PGM4);
-  strip.setPixelColor(mapLED(4), tuerkis);
+  strip.setPixelColor(mapLED(4), rot);
+  strip.show();
   delay(DELAY_FLASH_PGM4);
-  strip.setPixelColor(mapLED(3), tuerkis);
+  strip.setPixelColor(mapLED(3), rot);
+  strip.show();
   delay(DELAY_FLASH_PGM4);
-  strip.setPixelColor(mapLED(2), tuerkis);
+  strip.setPixelColor(mapLED(2), rot);
+  strip.show();
   delay(DELAY_FLASH_PGM4);
-  strip.setPixelColor(mapLED(1), tuerkis);
+  strip.setPixelColor(mapLED(1), rot);
+  strip.show();
   delay(DELAY_FLASH_PGM4);
 }
 
@@ -195,7 +202,7 @@ void pgm3()
 
 void setup()
 {
-  clock_prescale_set(clock_div_1);
+  //clock_prescale_set(clock_div_1);
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
 }
@@ -203,12 +210,16 @@ void setup()
 
 
 void loop() {
+    strip.clear();
+    strip.show();
     pgm3();    
     delay(2000);
     strip.clear();
     strip.show();
     schenkelblitz();
     delay(200);
+    strip.clear();
+    strip.show();
     schenkelblitz();
 }
 
