@@ -221,6 +221,10 @@ void loop() {
     strip.clear();
     strip.show();
     schenkelblitz();
+    strip.clear();
+    strip.show();
+    delay(2000);
+    
 }
 
 
