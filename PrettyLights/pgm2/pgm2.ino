@@ -63,20 +63,30 @@ Die leds wandern hoch und gehen wieder aus, es sind immer nur ca 5 leds an.
 
 */
 
+uint32_t orange = strip.Color(255, 105, 0);
+uint32_t blue = strip.Color(0, 0, 200);
+
+int current_b = 0;
+
 void pgm2()
 {
 
   //oberteil:
-  for (int idx = 0; idx < (sizeof(pgm2_leds) / sizeof(int)); idx += 2)
+  for (int idx = 0; idx < (sizeof(pgm2_leds) / sizeof(int)); idx ++)
   {
-    strip.setPixelColor(mapLED(pgm2_leds[idx]), strip.Color(255, 105, 0)); //orange
-    strip.setPixelColor(mapLED(pgm2_leds[idx + 1]), strip.Color(255, 105, 0)); //orange
+    
+    strip.setPixelColor(mapLED(pgm2_leds[idx]), orange); //orange
 
-    if (idx > 24)
+    if (idx > 4)
     {
-      strip.setPixelColor(mapLED(pgm2_leds[idx - 1]), strip.Color(0, 0, 200)); //blue
-      strip.setPixelColor(mapLED(pgm2_leds[idx - 2]), strip.Color(0, 0, 200)); //blue
+      strip.setPixelColor(mapLED(pgm2_leds[idx - 5]), strip.Color(0,0,0)); //off
     }
+
+    if(idx>0)
+    {
+      strip.setPixelColor(mapLED(pgm2_leds[idx-1]), blue); //orange
+    }
+ 
     if (BACK_TO_MAIN)
     {
       return;
@@ -85,13 +95,21 @@ void pgm2()
     delay(DELAY_PGM2);
   }
 
-/*
-  //dann ist man oben angekommen und nun geht es zurück. orange und aus
+  for (int idx = (sizeof(pgm2_leds) / sizeof(int))-5; idx < (sizeof(pgm2_leds) / sizeof(int)); idx ++)
+  {
+    strip.setPixelColor(mapLED(pgm2_leds[idx]), strip.Color(0,0,0)); //off
+    strip.show();
+    delay(DELAY_PGM2);
+  }
 
+  
+
+  //dann ist man oben angekommen und nun geht es zurück. orange und aus
+/*
   for (int idx = (sizeof(pgm2_leds) / sizeof(int) - 1); idx >= 0; idx -= 2)
   {
-    strip.setPixelColor(pgm2_leds[idx] - 1, strip.Color(255, 105, 0)); //orange
-    strip.setPixelColor(pgm2_leds[idx - 1] - 1, strip.Color(255, 105, 0)); //orange
+    strip.setPixelColor(pgm2_leds[idx] - 1, orange); //orange
+    strip.setPixelColor(pgm2_leds[idx - 1] - 1, orange); //orange
 
     if (idx < (sizeof(pgm2_leds) / sizeof(int)) - 1 )
     {
@@ -106,7 +124,6 @@ void pgm2()
     delay(DELAY_PGM2);
   }
 */
-
 }
 
 void setup()
