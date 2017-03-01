@@ -26,6 +26,15 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(51, PIN, NEO_GRB + NEO_KHZ800);
 
 
 
+int mapLED(int i)
+{
+  if(i<1)
+  {
+    return 0;
+  }
+  
+  return i - 1;
+}
 
 int leds_pgm1[] = {8,9,18,17, 11,12,13,14, 29,30,31,20, 26,25,24,23, 32,35,38,41,42,43,44,45,48,51};
 /*
@@ -95,7 +104,7 @@ void rainbow(int* _leds, uint8_t wait, int count) {
   for(j=0; j<256; j++) {
     for(i=0; i<count; i++) {
       //strip.setPixelColor(lednumbers[_leds[i]], Wheel((i+j) & 255));
-      strip.setPixelColor(_leds[i], Wheel((i+j) & 255));
+      strip.setPixelColor(mapLED(_leds[i]), Wheel((i+j) & 255));
     }
     strip.show();
     delay(wait);
