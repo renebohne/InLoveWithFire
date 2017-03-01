@@ -12,11 +12,18 @@
 #define BTN_INPUT 1
 #define BTN_GND 2
 
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(51, PIN, NEO_GRB + NEO_KHZ800);
+
+uint32_t tuerkis = strip.Color(0, 0x1F, 0x1F);  
+uint32_t rot = strip.Color(200, 0, 0);
+uint32_t orange = strip.Color(255, 105, 0);
+
+
+
 volatile int mode = -1;//0 macht alles aus... 1-4 sind die Programme
 
 boolean BACK_TO_MAIN = false;
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(51, PIN, NEO_GRB + NEO_KHZ800);
 
 #define DELAY_PGM1 10
 #define DELAY_PGM2 130
@@ -24,58 +31,53 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(51, PIN, NEO_GRB + NEO_KHZ800);
 #define DELAY_FLASH_PGM4 110
 
 
-//Etage
-//(ganz unten) A 24,25,26,27,28   9,10,11,12,13
-//B 21,22,23,29,30,31,  8,14,15,16,18,19
-//C 17,20,32,33,51,50
-//D 34,35,49,48
-//E 37,38,47,46
-//F 39,40,45,44
-//G 41,42,43
 
-//rainbow für etagen
-//rot,orange,gelb,grün,blau,indogo,violett
 
-//das sind die Nummern der LEDs von unten nach oben - natürliche Zähleweise von 1 an
-int lednumbers[] = {11, 26, 10, 12, 25, 27, 9, 13, 24, 28, 8, 14, 23, 29, 19, 15, 22, 30, 18, 16, 21, 31, 17, 20, 32, 51, 50, 33, 49, 34, 48, 35, 47, 36, 46, 37, 45, 38, 44, 39, 43, 40, 42, 41};
 
-//das sind die Anzahlen der LEDs pro Layer (eine Reihe)
-int lengths[] = {2, 4, 4, 4, 4, 4, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2};
-
-//das sind die Anzahlen der LEDs pro Etage für den Regenbogen(mehrere Reihen möglich)
-int length_etagen[] = {10, 12, 6, 4, 4, 4, 3};
-
-void layerByLayer()
+int mapLED(int i)
 {
-  int lednumbers_idx = 0;
-
-  for (int i = 0; i < (sizeof(lengths) / sizeof(int)); i++)
+  if(i<1)
   {
-    for (int j = 0; j < lengths[i]; j++)
-    {
-      strip.setPixelColor(lednumbers[lednumbers_idx + j], strip.Color(0, 0, 200));
-    }
-    strip.show();
-    lednumbers_idx += lengths[i];
+    return 0;
   }
+  
+  return i - 1;
 }
 
+int leds_pgm1[] = {8,9,18,17, 11,12,13,14, 29,30,31,20, 26,25,24,23, 32,35,38,41,42,43,44,45,48,51};
+int pgm2_leds[] = { 19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,  32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,  20,21,22,23,24,25,26,27,28,29};
+int pgm4_flash[] = { 7,6,5,4,3,2,1, 32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50, 51};
+int pgm4_rainbowA[] = {32,33,37,38,51,50,46,45,42};
+int pgm4_rainbowB[] = {34,35,36,39,41,49,48,47};
+
+
+void clearLEDs()//alles aus
+{
+   //alles aus
+    for (uint16_t i = 0; i < strip.numPixels(); i++) {
+      strip.setPixelColor(i, strip.Color(0, 0, 0));
+    }
+    strip.show();
+}
 
 
 void setup()
 {
   clock_prescale_set(clock_div_1);
+  strip.begin();
+  strip.show(); // Initialize all pixels to 'off'
+  
   pinMode(BTN_GND, OUTPUT);
   digitalWrite(BTN_GND, LOW);
 
   pinMode(BTN_INPUT, INPUT_PULLUP);
 
+  cli();
   GIMSK = 0b00100000;    // turns on pin change interrupts
   PCMSK = 0b00000010;   // turn on interrupt on PB1
   sei();                 // enables interrupts
 
-  strip.begin();
-  strip.show(); // Initialize all pixels to 'off'
+
 }
 
 
@@ -108,15 +110,9 @@ void loop() {
   }
   else
   {
-    //alles aus
-    for (uint16_t i = 0; i < strip.numPixels(); i++) {
-      strip.setPixelColor(i, strip.Color(0, 0, 0));
-    }
-    strip.show();
+   clearLEDs();
   }
 }
-
-
 
 
 void pgm0()
@@ -135,9 +131,6 @@ void pgm0()
   strip.show();
 }
 
-
-
-int leds_pgm1[] = {8,9,18,17, 11,12,13,14, 29,30,31,20, 26,25,24,23, 32,35,38,41,42,43,44,45,48,51};
 /*
 Programm 1.
 jetzt : alle leds im Rainbow fade von: hell zu : sehr hell
@@ -160,7 +153,8 @@ void pgm1()
   }
   strip.show();
   //rainbow breathing (heller und dunkler)
-  rainbow(leds_pgm1,DELAY_PGM1);
+  int count = sizeof(leds_pgm1)/sizeof(int);
+  rainbow(leds_pgm1,DELAY_PGM1, count);
   if (BACK_TO_MAIN)
   {
     return;
@@ -194,63 +188,30 @@ Die leds wandern hoch und gehen wieder aus, es sind immer nur ca 5 leds an.
 
 */
 
+
+uint32_t blue = strip.Color(0, 0, 200);
+
+int current_b = 0;
+
 void pgm2()
 {
-  //8-31 dauernd an
-  for (int i = 7; i < 31; i++)
-  {
-    strip.setPixelColor(i, strip.Color(0, 0, 200));
-  }
-  strip.show();
-  if (BACK_TO_MAIN)
-  {
-    return;
-  }
-
-  //7 orange, dann wird 7 blau, dafür 6 orange... das läuft hoch: 7,6,5,4,3,2,1, [32,51], [33,50], [34,49],[35,48],[36,47],[37,46],[38,45][39,44],[40,43],[41,42]
-  for (int i = 6; i > -1; i--)
-  {
-    for (int j = 0; j < 7; j++)
-    {
-      if (i == j)
-      {
-        strip.setPixelColor(j, strip.Color(255, 105, 0)); //orange
-      }
-      else if (i < j)
-      {
-        strip.setPixelColor(j, strip.Color(0, 0, 200)); //blue
-      }
-      else
-      {
-        strip.setPixelColor(j, strip.Color(0, 0, 0)); //off
-      }
-    }
-    if (BACK_TO_MAIN)
-    {
-      return;
-    }
-    strip.show();
-    delay(DELAY_PGM2);
-  }
-
-  //special leds blau
-  for (int i = 0; i < 7; i++)
-  {
-    strip.setPixelColor(i, strip.Color(0, 0, 200)); //blau
-  }
-
 
   //oberteil:
-  for (int idx = 24; idx < (sizeof(lednumbers) / sizeof(int)); idx += 2)
+  for (int idx = 0; idx < (sizeof(pgm2_leds) / sizeof(int)); idx ++)
   {
-    strip.setPixelColor(lednumbers[idx] - 1, strip.Color(255, 105, 0)); //orange
-    strip.setPixelColor(lednumbers[idx + 1] - 1, strip.Color(255, 105, 0)); //orange
+    
+    strip.setPixelColor(mapLED(pgm2_leds[idx]), orange); //orange
 
-    if (idx > 24)
+    if (idx > 4)
     {
-      strip.setPixelColor(lednumbers[idx - 1] - 1, strip.Color(0, 0, 200)); //blue
-      strip.setPixelColor(lednumbers[idx - 2] - 1, strip.Color(0, 0, 200)); //blue
+      strip.setPixelColor(mapLED(pgm2_leds[idx - 5]), strip.Color(0,0,0)); //off
     }
+
+    if(idx>0)
+    {
+      strip.setPixelColor(mapLED(pgm2_leds[idx-1]), blue); //orange
+    }
+ 
     if (BACK_TO_MAIN)
     {
       return;
@@ -258,18 +219,27 @@ void pgm2()
     strip.show();
     delay(DELAY_PGM2);
   }
+
+  for (int idx = (sizeof(pgm2_leds) / sizeof(int))-5; idx < (sizeof(pgm2_leds) / sizeof(int)); idx ++)
+  {
+    strip.setPixelColor(mapLED(pgm2_leds[idx]), strip.Color(0,0,0)); //off
+    strip.show();
+    delay(DELAY_PGM2);
+  }
+
+  
 
   //dann ist man oben angekommen und nun geht es zurück. orange und aus
-
-  for (int idx = (sizeof(lednumbers) / sizeof(int) - 1); idx >= 24; idx -= 2)
+/*
+  for (int idx = (sizeof(pgm2_leds) / sizeof(int) - 1); idx >= 0; idx -= 2)
   {
-    strip.setPixelColor(lednumbers[idx] - 1, strip.Color(255, 105, 0)); //orange
-    strip.setPixelColor(lednumbers[idx - 1] - 1, strip.Color(255, 105, 0)); //orange
+    strip.setPixelColor(pgm2_leds[idx] - 1, orange); //orange
+    strip.setPixelColor(pgm2_leds[idx - 1] - 1, orange); //orange
 
-    if (idx < (sizeof(lednumbers) / sizeof(int)) - 1 )
+    if (idx < (sizeof(pgm2_leds) / sizeof(int)) - 1 )
     {
-      strip.setPixelColor(lednumbers[idx + 1] - 1, strip.Color(0, 0, 0)); //off
-      strip.setPixelColor(lednumbers[idx + 2] - 1, strip.Color(0, 0, 0)); //off
+      strip.setPixelColor(pgm2_leds[idx + 1] - 1, strip.Color(0, 0, 0)); //off
+      strip.setPixelColor(pgm2_leds[idx + 2] - 1, strip.Color(0, 0, 0)); //off
     }
     if (BACK_TO_MAIN)
     {
@@ -278,67 +248,40 @@ void pgm2()
     strip.show();
     delay(DELAY_PGM2);
   }
-  //untersten beiden LEDs vom Oberteil ausschalten
-  strip.setPixelColor(lednumbers[25] - 1, strip.Color(0, 0, 0)); //off
-  strip.setPixelColor(lednumbers[24] - 1, strip.Color(0, 0, 0)); //off
-
-
-  for (int i = 0; i < 7; i++)
-  {
-    strip.setPixelColor(i, strip.Color(255, 105, 0)); //orange
-    if (i > 0)
-    {
-      strip.setPixelColor(i - 1, strip.Color(0, 0, 0)); //off
-    }
-    if (BACK_TO_MAIN)
-    {
-      return;
-    }
-    strip.show();
-    delay(DELAY_PGM2);
-  }
+*/
 }
 
 
-
-/*
-
-Programm 3:
-
-Farbe:grün/türkis. Hose füllt sich von unten nach oben in 2 parallelen Streifen auf.
-es gehen gleichzeitig an und bleiben an:
-8,11,29,26
-dann dazu:
-19,12,30,25
-dann dazu:
-18,13,31,24
-dann dazu:
-17,14,20,23
-
-Dann zu oberteil,
-32 und 51,
-33 und 50,
-34 und 49,
-36 u 48,
-37 und 47
-38 und 46
-39 und 45
-40 und 44
-41  und 43
-42wird und bleibt rot
-
-
-Programmierung Oberteil bleibt gleich  wie bisher aber  gleiche Farbe wie Hose, also läuft voll von vorn und hinten gleichzeitig nach oben/Schulter und geht dann aus, ausser 42, bleibt rot
-1-2.sec Pause dann 2 mal hintereinander der schnelle Schenkelblitz von programm 2,
-7,6,5,4,3,2,1 und nochmal  7,6,5,4,3,2,1
-2 sec pause
-danach wieder von Angfang an auffüllen ,wenns geht jetzt in einer anderen Farbe:, z.B 1 mal auffüllen in blau dann grün, und wieder türkis
-
-
-*/
-
-void pgm3()
+void schenkelblitz()
 {
+  
+  strip.setPixelColor(mapLED(7), rot);
+  strip.show();
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(6), rot);
+  strip.show();
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(5), rot);
+  strip.show();
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(4), rot);
+  strip.show();
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(3), rot);
+  strip.show();
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(2), rot);
+  strip.show();
+  delay(DELAY_FLASH_PGM4);
+  strip.setPixelColor(mapLED(1), rot);
+  strip.show();
+  delay(DELAY_FLASH_PGM4);
+  
+}
+
+void _pgm3()
+{
+  /*
   //5 Sekunden alles aus
   for (uint16_t i = 0; i < strip.numPixels(); i++) {
     strip.setPixelColor(i, strip.Color(0, 0, 0));
@@ -355,30 +298,109 @@ void pgm3()
       return;
     }
   }
-  //von unten nach oben innerhalb von 5 Sekunden, dann aus und von vorne starten
-  int lednumbers_idx = 0;
+  */
 
-  for (int i = 0; i < (sizeof(lengths) / sizeof(int)); i++)
-  {
-    for (int j = 0; j < lengths[i]; j++)
-    {
-      strip.setPixelColor(lednumbers[lednumbers_idx + j], strip.Color(0, 0, 200));
-    }
-    if (BACK_TO_MAIN)
-    {
-      return;
-    }
-    strip.show();
-    lednumbers_idx += lengths[i];
-    delay(DELAY_PGM3);
-  }
+  
+
+
+  strip.setPixelColor(mapLED(8), tuerkis);
+  strip.setPixelColor(mapLED(11), tuerkis);
+  strip.setPixelColor(mapLED(29), tuerkis);
+  strip.setPixelColor(mapLED(26), tuerkis);  
+  strip.show();
+  delay(DELAY_PGM3);
+
+  strip.setPixelColor(mapLED(19), tuerkis);
+  strip.setPixelColor(mapLED(12), tuerkis);
+  strip.setPixelColor(mapLED(30), tuerkis);
+  strip.setPixelColor(mapLED(25), tuerkis);  
+  strip.show();
+  delay(DELAY_PGM3);
+
+  strip.setPixelColor(mapLED(18), tuerkis);
+  strip.setPixelColor(mapLED(13), tuerkis);
+  strip.setPixelColor(mapLED(31), tuerkis);
+  strip.setPixelColor(mapLED(24), tuerkis);  
+  strip.show();
+  delay(DELAY_PGM3);
+
+
+  strip.setPixelColor(mapLED(17), tuerkis);
+  strip.setPixelColor(mapLED(14), tuerkis);
+  strip.setPixelColor(mapLED(20), tuerkis);
+  strip.setPixelColor(mapLED(23), tuerkis);  
+  strip.show();
+  delay(DELAY_PGM3);
+
+  strip.setPixelColor(mapLED(32), tuerkis);
+  strip.setPixelColor(mapLED(51), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+
+  strip.setPixelColor(mapLED(33), tuerkis);
+  strip.setPixelColor(mapLED(50), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+  
+  strip.setPixelColor(mapLED(34), tuerkis);
+  strip.setPixelColor(mapLED(49), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+
+  strip.setPixelColor(mapLED(36), tuerkis);
+  strip.setPixelColor(mapLED(48), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+  
+  strip.setPixelColor(mapLED(37), tuerkis);
+  strip.setPixelColor(mapLED(47), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+
+  strip.setPixelColor(mapLED(38), tuerkis);
+  strip.setPixelColor(mapLED(46), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+  
+  strip.setPixelColor(mapLED(39), tuerkis);
+  strip.setPixelColor(mapLED(45), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+
+  strip.setPixelColor(mapLED(40), tuerkis);
+  strip.setPixelColor(mapLED(44), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+
+  strip.setPixelColor(mapLED(41), tuerkis);
+  strip.setPixelColor(mapLED(43), tuerkis);
+  strip.show();
+  delay(DELAY_PGM3);
+  
+  strip.setPixelColor(mapLED(42), rot);
+  strip.show();
+  delay(DELAY_PGM3);
+  
 }
 
 
-
-
-
-
+void pgm3()
+{
+    strip.clear();
+    strip.show();
+    _pgm3();    
+    delay(2000);
+    strip.clear();
+    strip.show();
+    schenkelblitz();
+    delay(200);
+    strip.clear();
+    strip.show();
+    schenkelblitz();
+    strip.clear();
+    strip.show();
+    delay(2000);
+}
 
 /*
 programm 4
@@ -407,37 +429,29 @@ dann Sektion B
 mit feurigen Grüßen
 
 */
-
 void pgm4()
 {
-  //programm 2 vom letzten mal (cycling rainbow)
-  //und zusätzlich 7-1 orangenen Blitz von unten nach oben
-  //dann blitz direkt auf Oberteil weiter
-  //und dann weiter Rainbow ohne 7-1
-
-  //den Blitz alle 6 Sekunden machen
-
-  rainbowCycle(1);
+  
+  rainbow(pgm4_rainbowA,1,sizeof(pgm4_rainbowA)/sizeof(int));
+  clearLEDs();
+  rainbow(pgm4_rainbowB,1,sizeof(pgm4_rainbowB)/sizeof(int));
+      clearLEDs();
+  
   if (BACK_TO_MAIN)
   {
     return;
   }
   //6 Sekunden sind um
-
+ 
   //7 orange, dann 6 orange... das läuft hoch: 7,6,5,4,3,2,1, [32,51], [33,50], [34,49],[35,48],[36,47],[37,46],[38,45][39,44],[40,43],[41,42]
-  for (int i = 6; i > -1; i--)
+  for (int i = 0; i<sizeof(pgm4_flash)/sizeof(int);i++)
   {
-    for (int j = 0; j < 7; j++)
-    {
-      if (i == j)
+      if(i>0)
       {
-        strip.setPixelColor(j, strip.Color(255, 105, 0)); //orange
+        strip.setPixelColor(mapLED(pgm4_flash[i-1]), strip.Color(0, 0, 0)); //off
       }
-      else
-      {
-        strip.setPixelColor(j, strip.Color(0, 0, 0)); //off
-      }
-    }
+      strip.setPixelColor(mapLED(pgm4_flash[i]), orange); //orange
+ 
     if (BACK_TO_MAIN)
     {
       return;
@@ -446,32 +460,16 @@ void pgm4()
     delay(DELAY_FLASH_PGM4);
   }
 
-  //special leds aus
-  for (int i = 0; i < 7; i++)
-  {
-    strip.setPixelColor(i, strip.Color(0, 0, 0)); //aus
-  }
-
-
-  //oberteil:
-  for (int idx = 24; idx < (sizeof(lednumbers) / sizeof(int)); idx += 2)
-  {
-    strip.setPixelColor(lednumbers[idx] - 1, strip.Color(255, 105, 0)); //orange
-    strip.setPixelColor(lednumbers[idx + 1] - 1, strip.Color(255, 105, 0)); //orange
-
-    if (idx > 24)
-    {
-      strip.setPixelColor(lednumbers[idx - 1] - 1, strip.Color(0, 0, 0)); //aus
-      strip.setPixelColor(lednumbers[idx - 2] - 1, strip.Color(0, 0, 0)); //aus
-    }
-    if (BACK_TO_MAIN)
-    {
-      return;
-    }
-    strip.show();
-    delay(DELAY_FLASH_PGM4);
-  }
 }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -491,46 +489,18 @@ uint32_t Wheel(byte WheelPos) {
   return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
-void rainbow(int* _leds, uint8_t wait) {
+void rainbow(int* _leds, uint8_t wait, int count) {
   uint16_t i, j;
 
   for(j=0; j<256; j++) {
-    for(i=0; i<sizeof(_leds)/sizeof(int); i++) {
-      strip.setPixelColor(_leds[i], Wheel((i+j) & 255));
+    for(i=0; i<count; i++) {
+      //strip.setPixelColor(lednumbers[_leds[i]], Wheel((i+j) & 255));
+      strip.setPixelColor(mapLED(_leds[i]), Wheel((i+j) & 255));
     }
     strip.show();
     delay(wait);
   }
 }
-
-// Slightly different, this makes the rainbow equally distributed throughout
-void rainbowCycle(uint8_t wait) {
-  uint16_t i, j;
-
-  for (j = 0; j < 256 * 5; j++) { // 5 cycles of all colors on wheel
-    for (i = 0; i < strip.numPixels() - 7; i++) {
-      strip.setPixelColor(lednumbers[i] - 1, Wheel(((i * 256 / strip.numPixels()) + j) & 255));
-      if (BACK_TO_MAIN)
-      {
-        return;
-      }
-    }
-    strip.show();
-    delay(wait);
-    if (BACK_TO_MAIN)
-    {
-      return;
-    }
-  }
-}
-
-
-
-
-
-
-
-
 //variables to keep track of the timing of recent interrupts
 volatile unsigned long button_time = 0;
 volatile unsigned long last_button_time = 0;
